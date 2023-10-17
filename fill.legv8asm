@@ -1,0 +1,23 @@
+fill:
+//X0 = a[]
+//X1 = n
+//X2 = i
+//X3 = i * 8
+//X4 = n - i - 1
+
+CBZ X1, end_fill
+
+top_of_fill_loop:
+LSL X3, X2, #3
+ADD X0, X0, X3
+LDUR X0, [X0, #0]
+SUB X4, X1, X2
+SUBI X4, X4, #1
+STUR X0, [X4, #0]
+ADDI X2, X2, #1
+SUBS XZR, X2, X1
+B.GE end_fill
+B top_of_fill_loop
+
+end_fill:
+DUMP 
