@@ -9,11 +9,11 @@ CBZ X1, end_fill
 
 top_of_fill_loop:
 LSL X3, X2, #3
-ADD X0, X0, X3
-LDUR X0, [X0, #0]
+ADD X3, X0, X3
 SUB X4, X1, X2
 SUBI X4, X4, #1
-STUR X0, [X4, #0]
+STUR X4, [X3, #0]
+LDUR X6, [X0, #16] 
 ADDI X2, X2, #1
 SUBS XZR, X2, X1
 B.GE end_fill
