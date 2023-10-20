@@ -1,0 +1,61 @@
+
+
+cycle_sort:
+//X0 = a[]
+//X1 = n
+//X2 = cstart
+//X3 = val 
+//X4 = index
+//X5 = n-1
+//X6 = holder for array
+//X7 = temp
+//X8 = temp
+
+ADDI X2, XZR, #0
+//n will have preloaded value
+SUBI X5, X2, #1
+
+
+cycle_sort_top:
+ADDI X2, X2, #1
+SUBS X18, X2, X5
+CBZ finished_cycle
+
+LSL X6, X2, #3 //convert index to offset
+ADD X6, X0, X6 //$a[cstart]
+LDUR X3, [X6, #0] //value of a[cstart]
+
+//need to get index(X4) from find_index
+//send the array:X0, n:X1, cstart:X2, val:X3
+BL find_index
+
+SUBS X10, X4, X2
+CBZ cycle_sort_top
+
+
+//need to get index(X4) from skip_duplicates
+//send a:X0, index: X4, val: X3
+BL skip_duplicates
+
+//swap val and a[index]
+LSL X8, X4, #3
+ADD X8, X0, X8
+
+ADD X7, XZR, X3 //Add val to temp reg X7
+SUB X3, X3, X3 //remove value from val
+LDUR X3, [X8, #0] //load value of a[index] into val(X3)
+STUR X7, [X0, X8] //store X7 in array at offset of index
+SUB X7, X7, X7 //Remove values from temp reg X7
+SUB X8, X8, X8 //Remove values from temp reg X8
+
+
+//complete_cycle
+//send a: X0, n: X1, cstart: X2, index: X4, val: X3
+BL complete_cycle
+
+
+B cycle_sort_top
+
+
+finished_cycle:
+//DUMP
