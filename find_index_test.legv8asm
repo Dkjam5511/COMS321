@@ -39,7 +39,7 @@ find_index:
 //X11 = i * 8
 //X12 = value of a[i]
 
-ADDI X3, XZR, #5 = // value = 5
+ADDI X3, XZR, #5 // value = 5
 
 ADDI X2, XZR, #0 // Set start to 0
 ADDI X9, X2, #0 // index = start
