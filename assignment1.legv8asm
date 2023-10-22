@@ -216,8 +216,8 @@ fill:
 CBZ X1, end_fill //If n=0 just do nothing
 
 top_of_fill_loop:
-ADD X10, X0, X10  // a[i]
 LSL X10, X9, #3  //Shift i
+ADD X10, X0, X10  // a[i]
 SUB X11, X1, X9  //n - i
 SUBI X11, X11, #1  // n - i - 1
 STUR X11, [X10, #0]  // store X11 in a[i]
@@ -267,7 +267,8 @@ ADDI X1, X9, #1    //start = index + 1
 B binary_search
 
 return_failure:
-ADDI X0, XZR, #-1 
+ADDI X0, XZR, #-1
+BR LR 
 
 return_binary_search:
 ADDI X0, X9, #0
@@ -275,7 +276,7 @@ BR LR
 
 
 main:
-ADDI X1, XZR, #10 //n = 10
+ADDI X1, XZR, #10000 //n = 10000
 
 SUBI SP, SP, #8 
 STUR X1, [SP, #0] //Save n to stack
@@ -284,4 +285,51 @@ BL fill
 
 LDUR X1, [SP, #0]
 
-BL cycle_sort
+SUBI SP, SP, #16 
+STUR X0, [SP, #0] //Save a[] to stack
+STUR X1, [SP, #8] //Save n to stack
+
+ADDI X2, X1, #-1 //X2 = N - 1 
+ADDI X1, XZR, #0 // X1 = 0
+ADDI X3, XZR, #0 // X3 = 0
+
+BL binary_search
+
+PRNT X0
+
+LDUR X0, [SP, #0]
+LDUR X1, [SP, #8]
+
+ADDI X2, X1, #-1 //X2 = N - 1 
+ADDI X3, X1, #-1 // X3 = N - 1 
+ADDI X1, XZR, #0 // X1 = 0
+
+BL binary_search
+
+PRNT X0
+
+LDUR X0, [SP, #0]
+LDUR X1, [SP, #8]
+
+ADDI X2, X1, #-1 //X2 = N - 1 
+LSR X3, X1, #1 // X3 = N - 1 
+ADDI X1, XZR, #0 // X1 = 0
+
+BL binary_search
+
+PRNT X0
+
+LDUR X0, [SP, #0]
+LDUR X1, [SP, #8]
+
+ADDI X2, X1, #-1 //X2 = N - 1 
+ADDI X3, X1, #0 // X3 = N
+ADDI X1, XZR, #0 // X1 = 0
+
+PRNT X1
+PRNT X2
+PRNT X3
+
+BL binary_search
+
+PRNT X0
