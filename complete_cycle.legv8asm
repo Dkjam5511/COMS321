@@ -5,6 +5,8 @@ complete_cycle:
 //X3 = index
 //X4 = value
 //X9 = index - start
+//X10 = a[]
+//X11 = a[index]
 
 SUBI X9, X3, X2
 CBZ X9, end_complete_cycle

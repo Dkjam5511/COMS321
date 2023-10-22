@@ -3,38 +3,39 @@ binary_search:
 //X1 = start
 //X2 = end
 //X3 = value
-//X4 = index
-//X5 = start + end
-//X6 = a[index]
-//X7 = a[index] - value | Should be 0 if equvivilent 
+//X9 = index
+//X10 = start + end
+//X11 = a[index]
+//X12 = a[index] - value | Should be 0 if equvivilent 
 
 SUBS XZR, X2, X1   //if end < start
 B.LT return_failure 
 
-ADD X5, X1, X2    //start + end
+ADD X10, X1, X2    //start + end
 
-LSR X4, X5, #1    //Divide by 2 by shifting right once
+LSR X9, X10, #1    //Divide by 2 by shifting right once
 
-ADD X6, X0, X4  // a[index]
+ADD X11, X0, X9  // a[index]
 
-SUB X7, X6, X3     // a[index] - value
-CBZ X7, return_binary_search   // a[index] - value = 0 meaning they are equivilent and index is found
+SUB X12, X11, X3     // a[index] - value
+CBZ X12, return_binary_search   // a[index] - value = 0 meaning they are equivilent and index is found
 
-SUBS XZR, X6, X3   // a[index] > value
+SUBS XZR, X11, X3   // a[index] > value
 B.GT minus_one
 
 B plus_one
 
 minus_one:
-SUBI X2, X4, #1    //end = index - 1
+SUBI X2, X9, #1    //end = index - 1
 B binary_search
 
 plus_one:
-ADDI X1, X4, #1    //start = index + 1
+ADDI X1, X9, #1    //start = index + 1
 B binary_search
 
 return_failure:
 ADDI X0, XZR, #-1 
 
 return_binary_search:
-PRNT X4
+PRNT X9
+ADDI X0, X9, #0

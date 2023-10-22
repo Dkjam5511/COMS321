@@ -1,21 +1,21 @@
 fill:
 //X0 = a[]
 //X1 = n
-//X2 = i
-//X3 = i * 8
-//X4 = n - i - 1
+//X9 = i
+//X10 = i * 8
+//X11 = n - i - 1
 
 
 CBZ X1, end_fill //If n=0 just do nothing
 
 top_of_fill_loop:
-ADD X3, X0, X3  // a[i]
-LSL X3, X2, #3  //Shift i
-SUB X4, X1, X2  //n - i
-SUBI X4, X4, #1  // n - i - 1
-STUR X4, [X3, #0]  // store X4 in a[i]
-ADDI X2, X2, #1    // i++
-SUBS XZR, X2, X1   // set flag for i < n
+ADD X10, X0, X10  // a[i]
+LSL X10, X9, #3  //Shift i
+SUB X11, X1, X9  //n - i
+SUBI X11, X11, #1  // n - i - 1
+STUR X11, [X10, #0]  // store X11 in a[i]
+ADDI X9, X9, #1    // i++
+SUBS XZR, X9, X1   // set flag for i < n
 B.GE end_fill
 B top_of_fill_loop
 
