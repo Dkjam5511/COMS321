@@ -326,10 +326,6 @@ ADDI X2, X1, #-1 //X2 = N - 1
 ADDI X3, X1, #0 // X3 = N
 ADDI X1, XZR, #0 // X1 = 0
 
-PRNT X1
-PRNT X2
-PRNT X3
-
 BL binary_search
 
 PRNT X0
