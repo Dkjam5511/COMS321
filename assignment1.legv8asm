@@ -1,4 +1,8 @@
+//Andrew Ahrekiel and Drew Kinneer
+//NETIDs: andrewa3 and dkinneer
+
 B main
+
 
 swap:
 //X0 = a
@@ -6,13 +10,10 @@ swap:
 //X9 = tmp
 //X10 = tmp
 
-LDUR X9, [X1, #0] //value of a[index]
+LDUR X9, [X1, #0] //value of b
 ADD X10, X0, XZR
 ADD X0, X9, XZR
 STUR X10, [X1, #0]
-
-
-
 BR LR
 
 
@@ -25,9 +26,6 @@ find_index:
 //X10 = i
 //X11 = i * 8
 //X12 = value of a[i]
-
-//ADDI X3, XZR, #5 // value = 5
-
 ADDI X2, XZR, #0 // Set start to 0
 ADDI X9, X2, #0 // index = start
 ADDI X10, X2, #1 // i = start + 1
@@ -54,14 +52,11 @@ ADDI X0, X9, #0
 BR LR
 
 
-
 skip_duplicates:
 //X0 = a[]
 //X1 = start
 //X2 = value
 //X10 = index
-ADDI X1, XZR, #1 //for test
-ADDI X2, XZR, #5 //for test
 
 ADD X10, XZR, X1 // index = start
 ADD X13, XZR, X2 // X13 = value
@@ -70,10 +65,6 @@ top_of_skip_dup:
 LSL X11, X10, #3 //convert index to offset
 ADD X11, X0, X11 //$a[index]
 LDUR X12, [X11, #0] //X12 = a[index]
-
-//for test
-//PRNT X13
-//PRNT X12
 
 SUBS X14, X13, X12  //value - a[index]
 CBNZ X14, found_index //if not equal, then branch to found index
@@ -105,10 +96,7 @@ STUR X3, [SP, #24]
 STUR X4, [SP, #32]
 STUR LR, [SP, #40]
 
-
 top_complete_cycle_loop:
-
-
 SUB X9, X3, X2
 CBZ X9, end_complete_cycle
 
@@ -118,37 +106,26 @@ BL find_index
 
 ADD X3, X0, XZR // Set index = X3 to get return value from find_index 
 
+LDUR X0, [SP, #0] // Restore X0
+LDUR X1, [SP, #8] // Restore X1
+LDUR X2, [SP, #16] // Restore X2
+LDUR X4, [SP, #32] // Restore X4
+
+STUR X3, [SP, #24]
+
+ADDI X1, X3, #0  //Set X1 to index
+ADDI X2, X4, #0  //Set X2 to value
+
+BL skip_duplicates
+
+ADD X3, X0, XZR // Set index = X3 to get return value from skip_duplicates
 
 LDUR X0, [SP, #0] // Restore X0
 LDUR X1, [SP, #8] // Restore X1
 LDUR X2, [SP, #16] // Restore X2
 LDUR X4, [SP, #32] // Restore X4
 
-
-
-// STUR X0, [SP, #0]
-// STUR X1, [SP, #8]
-// STUR X2, [SP, #16]
-// STUR X3, [SP, #24]
-// STUR X4, [SP, #32]
-
-// ADDI X1, X3, #0  //Set X1 to index
-// ADDI X2, X4, #0  //Set X2 to value
-
-// BL skip_duplicates
-
-// ADD X3, X0, XZR // Set index = X3 to get return value from skip_duplicates
-
-// LDUR X0, [SP, #0] // Restore X0
-// LDUR X1, [SP, #8] // Restore X1
-// LDUR X2, [SP, #16] // Restore X2
-// LDUR X4, [SP, #32] // Restore X4
-
-// STUR X0, [SP, #0]
-// STUR X1, [SP, #8]
-// STUR X2, [SP, #16]
-// STUR X3, [SP, #24]
-// STUR X4, [SP, #32]
+STUR X3, [SP, #24]
 
 //swap val and a[index]
 LSL X10, X3, #3 //shift index
@@ -157,23 +134,6 @@ LDUR X11, [X10, #0] //value of a[index]
 ADD X12, X4, XZR 
 ADD X4, X11, XZR
 STUR X12, [X10, #0] 
-
-
-//un used swap code
-// ADD X0, X4, XZR //val in X0 for swap
-// ADD X1, X10, XZR //address for a[index] for swap
-
-// BL swap
-
-// LDUR X0, [SP, #0] // Restore X0
-// LDUR X1, [SP, #8] // Restore X1
-// LDUR X2, [SP, #16] // Restore X2
-// LDUR X3, [SP, #24]
-// LDUR X4, [SP, #32] // Restore X4
-
-
-
-
 
 SUB X12, X12, X12
 SUB X11, X11, X11
@@ -185,14 +145,6 @@ STUR X2, [SP, #16]
 STUR X3, [SP, #24]
 STUR X4, [SP, #32]
 
-
-// ADDI X1, X11, #0 //move a[index] to be parameter X1
-
-// ADDI X0, X4, #0 //move value to be parameter X0
-// BL swap
-
-//TODO reassign the values after the swap
-
 B top_complete_cycle_loop
 
 end_complete_cycle:
@@ -203,7 +155,6 @@ BR LR
 
 
 cycle_sort:
-
 //params that need to stay on the stack
 //X0 = a[]
 //X1 = n
@@ -218,12 +169,9 @@ cycle_sort:
 //X12 = temp
 //X13 = temp
 
-
-
 ADDI X2, XZR, #-1 //set cstart to zero
 
 //n will have preloaded value
-//SUBI X9, X1, #1 //X9 = n-1
 
 SUBI SP, SP, #48 //Make space on stack
 
@@ -240,20 +188,12 @@ SUBI X9, X1, #1
 SUBS XZR, X2, X9  // X13 = cstart - (n-1), checks to see if for loop is done
 B.GE finished_cycle
 
-//PRNT X2
-
 LSL X10, X2, #3 //convert index to offset
 ADD X10, X0, X10 //$a[cstart]
 LDUR X3, [X10, #0] //value equals a[cstart]
 
-
-// //need to get index(X4) from find_index
-// //send the array:X0, n:X1, cstart:X2, val:X3
-
-
 STUR X2, [SP, #16]
 STUR X3, [SP, #24]
-
 
 BL find_index
 
@@ -263,7 +203,6 @@ LDUR X0, [SP, #0] // Restore X0
 LDUR X1, [SP, #8] // Restore X1
 LDUR X2, [SP, #16] // Restore X2
 LDUR X3, [SP, #24] // Restore X3
-
 
 SUB X10, X4, X2
 CBZ X10, cycle_sort_top
@@ -288,8 +227,6 @@ LDUR X1, [SP, #8] // Restore X1
 LDUR X2, [SP, #16] // Restore X2
 LDUR X3, [SP, #24] // Restore X3
 
-
-
 //swap val and a[index]
 LSL X12, X4, #3
 ADD X12, X0, X12
@@ -303,7 +240,6 @@ STUR X11, [X12, #0] //store X11 in array at offset of index
 SUB X11, X11, X11 //Remove values from temp reg X11
 SUB X12, X12, X12 //Remove values from temp reg X12
 
-
 //complete_cycle
 //send a: X0, n: X1, cstart: X2, index: X4, val: X3
 
@@ -314,16 +250,9 @@ STUR X3, [SP, #24]
 STUR X4, [SP, #32]
 
 //swap values of X3 and X4 for function call
-
-
-
-
-
 ADD X11, X3, XZR
 ADD X3, X4, XZR
 ADD X4, X11, XZR
-
-
 
 BL complete_cycle
 
@@ -333,14 +262,12 @@ LDUR X2, [SP, #16] // Restore X2
 LDUR X3, [SP, #24] // Restore X3
 LDUR X4, [SP, #32]
 
-
 B cycle_sort_top
 
 finished_cycle:
 LDUR LR, [SP, #40]
 ADDI SP, SP, #48  //remove space on Stack
 BR LR
-
 
 
 fill:
@@ -366,7 +293,6 @@ B top_of_fill_loop
 
 end_fill:
 BR LR
-
 
 
 binary_search:
@@ -421,7 +347,6 @@ STUR X1, [SP, #0] //Save n to stack
 
 BL fill
 
-
 LDUR X1, [SP, #0]
 ADDI SP, SP, #8
 
@@ -431,29 +356,8 @@ STUR X1, [SP, #8] //Save n to stack
 
 BL cycle_sort
 
-LDUR X10, [X0, #0]
-PRNT X10
-LDUR X10, [X0, #8]
-PRNT X10
-LDUR X10, [X0, #16]
-PRNT X10
-LDUR X10, [X0, #24]
-PRNT X10
-LDUR X10, [X0, #32]
-PRNT X10
-LDUR X10, [X0, #40]
-PRNT X10
-LDUR X10, [X0, #48]
-PRNT X10
-LDUR X10, [X0, #56]
-PRNT X10
-LDUR X10, [X0, #64]
-PRNT X10
-
 LDUR X0, [SP, #0]
 LDUR X1, [SP, #8]
-
-
 
 STUR X0, [SP, #0] //Save a[] to stack
 STUR X1, [SP, #8] //Save n to stack
