@@ -237,9 +237,6 @@ LDUR X3, [X12, #0] //load value of a[index] into val(X3)
 
 STUR X11, [X12, #0] //store X11 in array at offset of index
 
-SUB X11, X11, X11 //Remove values from temp reg X11
-SUB X12, X12, X12 //Remove values from temp reg X12
-
 //complete_cycle
 //send a: X0, n: X1, cstart: X2, index: X4, val: X3
 
