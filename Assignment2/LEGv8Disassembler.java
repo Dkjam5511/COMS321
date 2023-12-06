@@ -116,12 +116,12 @@ public class LEGv8Disassembler {
     public static void InsertInstructions() {
         R_instructionMap.put(0b10001011000, "ADD");
         I_instructionMap.put(0b1001000100, "ADDI");
-        I_instructionMap.put(0b1011000100, "ADDIS");
-        R_instructionMap.put(0b10101011000, "ADDS");
+        // I_instructionMap.put(0b1011000100, "ADDIS");
+        // R_instructionMap.put(0b10101011000, "ADDS");
         R_instructionMap.put(0b10001010000, "AND");
         I_instructionMap.put(0b1001001000, "ANDI");
-        I_instructionMap.put(0b1111001000, "ANDIS");
-        R_instructionMap.put(0b1110101000, "ANDS");
+        // I_instructionMap.put(0b1111001000, "ANDIS");
+        // R_instructionMap.put(0b1110101000, "ANDS");
         B_instructionMap.put(0b000101, "B");
         CB_instructionMap.put(0b01010100, "B.");
         B_instructionMap.put(0b100101, "BL");
@@ -131,23 +131,23 @@ public class LEGv8Disassembler {
         R_instructionMap.put(0b11111111110, "DUMP");
         R_instructionMap.put(0b11001010000, "EOR");
         I_instructionMap.put(0b1101001000, "EORI");
-        R_instructionMap.put(0b00011110011, "FADDD");
-        R_instructionMap.put(0b00011110001, "FADDS");
-        R_instructionMap.put(0b00011110011, "FCMPD");
-        R_instructionMap.put(0b00011110001, "FCMPS");
-        R_instructionMap.put(0b00011110011, "FDIVD");
-        R_instructionMap.put(0b00011110001, "FDIVS");
-        R_instructionMap.put(0b00011110011, "FMULD");
-        R_instructionMap.put(0b00011110001, "FMULS");
-        R_instructionMap.put(0b00011110011, "FSUBD");
-        R_instructionMap.put(0b00011110001, "FSUBS");
+        // R_instructionMap.put(0b00011110011, "FADDD");
+        // R_instructionMap.put(0b00011110001, "FADDS");
+        // R_instructionMap.put(0b00011110011, "FCMPD");
+        // R_instructionMap.put(0b00011110001, "FCMPS");
+        // R_instructionMap.put(0b00011110011, "FDIVD");
+        // R_instructionMap.put(0b00011110001, "FDIVS");
+        // R_instructionMap.put(0b00011110011, "FMULD");
+        // R_instructionMap.put(0b00011110001, "FMULS");
+        // R_instructionMap.put(0b00011110011, "FSUBD");
+        // R_instructionMap.put(0b00011110001, "FSUBS");
         R_instructionMap.put(0b11111111111, "HALT");
         D_instructionMap.put(0b11111000010, "LDUR");
-        D_instructionMap.put(0b00111000010, "LDURB");
-        R_instructionMap.put(0b11111100010, "LDURD");
-        D_instructionMap.put(0b01111000010, "LDURH");
-        R_instructionMap.put(0b10111100010, "LDURS");
-        D_instructionMap.put(0b10111000100, "LDURSW");
+        // D_instructionMap.put(0b00111000010, "LDURB");
+        // R_instructionMap.put(0b11111100010, "LDURD");
+        // D_instructionMap.put(0b01111000010, "LDURH");
+        // R_instructionMap.put(0b10111100010, "LDURS");
+        // D_instructionMap.put(0b10111000100, "LDURSW");
         R_instructionMap.put(0b11010011011, "LSL");
         R_instructionMap.put(0b11010011010, "LSR");
         R_instructionMap.put(0b10011011000, "MUL");
@@ -155,20 +155,20 @@ public class LEGv8Disassembler {
         I_instructionMap.put(0b1011001000, "ORRI");
         R_instructionMap.put(0b11111111100, "PRNL");
         R_instructionMap.put(0b11111111101, "PRNT");
-        R_instructionMap.put(0b10011010110, "SDIV");
-        R_instructionMap.put(0b10011011010, "SMULH");
+        // R_instructionMap.put(0b10011010110, "SDIV");
+        // R_instructionMap.put(0b10011011010, "SMULH");
         D_instructionMap.put(0b11111000000, "STUR");
-        D_instructionMap.put(0b00111000000, "STURB");
-        R_instructionMap.put(0b11111100000, "STURD");
-        D_instructionMap.put(0b01111000000, "STURH");
-        R_instructionMap.put(0b10111100000, "STURS");
-        D_instructionMap.put(0b10111000000, "STURW");
+        // D_instructionMap.put(0b00111000000, "STURB");
+        // R_instructionMap.put(0b11111100000, "STURD");
+        // D_instructionMap.put(0b01111000000, "STURH");
+        // R_instructionMap.put(0b10111100000, "STURS");
+        // D_instructionMap.put(0b10111000000, "STURW");
         R_instructionMap.put(0b11001011000, "SUB");
         I_instructionMap.put(0b1101000100, "SUBI");
         I_instructionMap.put(0b1111000100, "SUBIS");
         R_instructionMap.put(0b11101011000, "SUBS");
-        R_instructionMap.put(0b10011010110, "UDIV");
-        R_instructionMap.put(0b10011011110, "UMULH");
+        // R_instructionMap.put(0b10011010110, "UDIV");
+        // R_instructionMap.put(0b10011011110, "UMULH");
     }
 
     // Insert conditions into the map
@@ -220,6 +220,18 @@ class RInstruction extends Instruction {
         }
         if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("BR")){
             return name + " X" + Rn;
+        }
+        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("PRNT")){
+            return name + " X" + Rn;
+        }
+        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("PRNL")){
+            return name;
+        }
+        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("DUMP")){
+            return name;
+        }
+        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("HALT")){
+            return name;
         }
         return name + " X" + Rd + ", X" + Rn + ", X" + Rm;
     }
@@ -278,7 +290,7 @@ class BInstruction extends Instruction {
         opcode = (instruction >>> 26); // Extract bits 26-31
         BR_address = instruction & 0x3FFFFFF; // Extract bits 0-25
 
-        // Check if the most significant bit is set
+        //Check if the most significant bit is set
         if ((BR_address & 0x02000000) != 0) {
             // Perform sign extension
             BR_address |= 0xFC000000;
@@ -290,7 +302,8 @@ class BInstruction extends Instruction {
 
     @Override
     public String toString() {
-        return name + " #" + BR_address;
+        String addressSyntax = String.format("0x%08X", BR_address);
+        return name + " " + addressSyntax;
     }
 }
 
@@ -319,9 +332,10 @@ class CBInstruction extends Instruction {
 
     @Override
     public String toString() {
+        String addressSyntax = String.format("0x%08X", COND_BR_address);
         if (LEGv8Disassembler.CB_instructionMap.get(opcode).equals("B.")){
-            return name + condName + " #" + COND_BR_address;
+            return name + condName + " " + addressSyntax;
         }
-        return name + " X" + Rt + ", #" + COND_BR_address;
+        return name + " X" + Rt + ", " + addressSyntax;
     }
 }

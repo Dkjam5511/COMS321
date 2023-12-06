@@ -1,18 +1,15 @@
-main:
 
-CBZ X10, main
+
+B main
+
+
+main:
+B end
+CBZ X10, end
 CBNZ X10, main
 B.EQ main
 B.NE main
-B.HS main
-B.LO main
-B.MI main
-B.PL main
-B.VS main
-B.VC main
-B.HI main
-B.LS main
-B.GE main
-B.LT main
-B.GT main
-B.LE main
+
+
+end:
+HALT 
