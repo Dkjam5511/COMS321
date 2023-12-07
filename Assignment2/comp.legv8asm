@@ -1,15 +1,4 @@
 
-
-B main
-
-
-main:
-B end
-CBZ X10, end
-CBNZ X10, main
-B.EQ main
-B.NE main
-
-
-end:
-HALT 
+ADDI X1, X2, #10000
+ADDI X1, X2, #-2048
+ADDI X1, X2, #-1

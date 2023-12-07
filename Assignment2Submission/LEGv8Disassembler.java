@@ -27,7 +27,6 @@ public class LEGv8Disassembler {
             instructions = new int[instructionCount];
             for (int i = 0; i < instructionCount; i++) {
                 instructions[i] = buffer.getInt();
-                System.out.println(Integer.toBinaryString(instructions[i]));
             }
             file.close();
         } catch (IOException e) {
