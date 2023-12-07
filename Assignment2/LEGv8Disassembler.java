@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +54,7 @@ public class LEGv8Disassembler {
                         break;
                     case B:
                         instructionList.add(new BInstruction(instruction));
-                        break;        
+                        break;
                     case CB:
                         instructionList.add(new CBInstruction(instruction));
                         break;
@@ -60,9 +62,52 @@ public class LEGv8Disassembler {
             }
         }
 
+        ArrayList<Label> labelList = new ArrayList<>();
+        int labelCount = 1;
+
+        for (int i = 0; i < instructionList.size(); i++) {
+            Instruction instruction = instructionList.get(i);
+            if (instruction instanceof LabelInstruction) { // Check if instruction would have a label
+                LabelInstruction labelInstruction = (LabelInstruction) instruction;
+                int BR_address = labelInstruction.getBR_address();
+                int labelIndex = getIndexInLabelList(labelList, i + BR_address);
+                if (labelIndex != -1) { //If label already exists
+                    labelInstruction.setLabelName(labelList.get(labelIndex).name); // Set label name to existing label
+                } else {
+                    labelList.add(new Label("label" + labelCount, i + BR_address)); // Create new label
+                    labelInstruction.setLabelName("label" + labelCount);
+                    labelCount++;
+                }
+                instructionList.set(i, labelInstruction); // Replace instruction with labelInstruction
+            }
+        }
+
+        //Sort labelList so the labels are in ascending order relative to where they are put in the instructionList
+        Collections.sort(labelList, new Comparator<Label>() {
+            @Override
+            public int compare(Label label1, Label label2) {
+                return Integer.compare(label1.getIndex(), label2.getIndex());
+            }
+        });
+
+        int offset = 0; //Keeps track of how many labels have been added so the indexes line up
+        for (int i = 0; i < labelList.size(); i++) {
+            instructionList.add(labelList.get(i).getIndex() + offset, labelList.get(i));
+            offset++; 
+        }
+
         for (Instruction instruction : instructionList) {
             System.out.println(instruction.toString());
         }
+    }
+
+    private static int getIndexInLabelList(ArrayList<Label> labelList, int index) {
+        for (int i = 0; i < labelList.size(); i++) {
+            if (labelList.get(i).getIndex() == index) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     enum InstructionType {
@@ -71,29 +116,29 @@ public class LEGv8Disassembler {
 
     private static InstructionType getInstructionType(int instruction) {
         int opcode = (instruction >>> 21); // R and D instructions opcode is in bits 21-31
-        //Check if opcode is in R_instructionMap
+        // Check if opcode is in R_instructionMap
         if (R_instructionMap.containsKey(opcode)) {
             return InstructionType.R;
         }
-        //Check if opcode is in D_instructionMap
-        if(D_instructionMap.containsKey(opcode)){
+        // Check if opcode is in D_instructionMap
+        if (D_instructionMap.containsKey(opcode)) {
             return InstructionType.D;
         }
 
         opcode = (opcode >>> 1); // I instructions opcode is in bits 22-31
-        //Check if opcode is in I_instructionMap
+        // Check if opcode is in I_instructionMap
         if (I_instructionMap.containsKey(opcode)) {
             return InstructionType.I;
         }
-        
+
         opcode = (opcode >>> 2); // CB instructions opcode is in bits 24-31
-        //Check if opcode is in CB_instructionMap
+        // Check if opcode is in CB_instructionMap
         if (CB_instructionMap.containsKey(opcode)) {
             return InstructionType.CB;
         }
 
         opcode = (opcode >>> 2); // B instructions opcode is in bits 26-31
-        //Check if opcode is in B_instructionMap
+        // Check if opcode is in B_instructionMap
         if (B_instructionMap.containsKey(opcode)) {
             return InstructionType.B;
         }
@@ -101,7 +146,6 @@ public class LEGv8Disassembler {
         // If not in any of the maps, return null
         return null;
     }
-
 
     // Maps for instructions and conditions
     static final Map<Integer, String> R_instructionMap = new HashMap<>();
@@ -111,7 +155,6 @@ public class LEGv8Disassembler {
     static final Map<Integer, String> CB_instructionMap = new HashMap<>();
     static final Map<Integer, String> conditionMap = new HashMap<>();
 
-    
     // Insert instructions into the maps
     public static void InsertInstructions() {
         R_instructionMap.put(0b10001011000, "ADD");
@@ -172,7 +215,7 @@ public class LEGv8Disassembler {
     }
 
     // Insert conditions into the map
-    public static void InsertConditions(){
+    public static void InsertConditions() {
         conditionMap.put(0b00000, "EQ");
         conditionMap.put(0b00001, "NE");
         conditionMap.put(0b00010, "HS");
@@ -210,27 +253,28 @@ class RInstruction extends Instruction {
         Rn = (instruction >>> 5) & 0x1F; // Extract bits 5-9
         Rd = instruction & 0x1F; // Extract bits 0-4
         name = LEGv8Disassembler.R_instructionMap.get(opcode);
-        
+
     }
 
     @Override
     public String toString() {
-        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("LSL") || LEGv8Disassembler.R_instructionMap.get(opcode).equals("LSR")){
+        if (LEGv8Disassembler.R_instructionMap.get(opcode).equals("LSL")
+                || LEGv8Disassembler.R_instructionMap.get(opcode).equals("LSR")) {
             return name + " X" + Rd + ", X" + Rn + ", #" + shamt;
         }
-        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("BR")){
+        if (LEGv8Disassembler.R_instructionMap.get(opcode).equals("BR")) {
             return name + " X" + Rn;
         }
-        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("PRNT")){
+        if (LEGv8Disassembler.R_instructionMap.get(opcode).equals("PRNT")) {
             return name + " X" + Rn;
         }
-        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("PRNL")){
+        if (LEGv8Disassembler.R_instructionMap.get(opcode).equals("PRNL")) {
             return name;
         }
-        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("DUMP")){
+        if (LEGv8Disassembler.R_instructionMap.get(opcode).equals("DUMP")) {
             return name;
         }
-        if(LEGv8Disassembler.R_instructionMap.get(opcode).equals("HALT")){
+        if (LEGv8Disassembler.R_instructionMap.get(opcode).equals("HALT")) {
             return name;
         }
         return name + " X" + Rd + ", X" + Rn + ", X" + Rm;
@@ -281,35 +325,44 @@ class DInstruction extends Instruction {
     }
 }
 
-class BInstruction extends Instruction {
-    int opcode;
+abstract class LabelInstruction extends Instruction {
+    String labelName = "";
     int BR_address;
+
+    public int getBR_address() {
+        return BR_address;
+    }
+
+    public void setLabelName(String labelName) {
+        this.labelName = labelName;
+    }
+}
+
+class BInstruction extends LabelInstruction {
+    int opcode;
     String name;
 
     BInstruction(int instruction) {
         opcode = (instruction >>> 26); // Extract bits 26-31
         BR_address = instruction & 0x3FFFFFF; // Extract bits 0-25
 
-        //Check if the most significant bit is set
+        // Check if the most significant bit is set
         if ((BR_address & 0x02000000) != 0) {
             // Perform sign extension
             BR_address |= 0xFC000000;
         }
-
 
         name = LEGv8Disassembler.B_instructionMap.get(opcode);
     }
 
     @Override
     public String toString() {
-        String addressSyntax = String.format("0x%08X", BR_address);
-        return name + " " + addressSyntax;
+        return name + " " + labelName;
     }
 }
 
-class CBInstruction extends Instruction {
+class CBInstruction extends LabelInstruction {
     int opcode;
-    int COND_BR_address;
     int Rt;
     String name;
     String condName;
@@ -317,12 +370,12 @@ class CBInstruction extends Instruction {
     CBInstruction(int instruction) {
         opcode = (instruction >>> 24); // Extract bits 24-31
 
-        COND_BR_address = (instruction >>> 5) & 0x7FFFF; // Extract bits 5-23
-        //Check if the most significant bit is set
+        BR_address = (instruction >>> 5) & 0x7FFFF; // Extract bits 5-23
         // Check if the most significant bit is set
-        if ((COND_BR_address & 0x00020000) != 0) {
+        // Check if the most significant bit is set
+        if ((BR_address & 0x00020000) != 0) {
             // Perform sign extension
-            COND_BR_address |= 0xFFFC0000;
+            BR_address |= 0xFFFC0000;
         }
 
         Rt = instruction & 0x1F; // Extract bits 0-4
@@ -332,10 +385,28 @@ class CBInstruction extends Instruction {
 
     @Override
     public String toString() {
-        String addressSyntax = String.format("0x%08X", COND_BR_address);
-        if (LEGv8Disassembler.CB_instructionMap.get(opcode).equals("B.")){
-            return name + condName + " " + addressSyntax;
+        if (LEGv8Disassembler.CB_instructionMap.get(opcode).equals("B.")) {
+            return name + condName + " " + labelName;
         }
-        return name + " X" + Rt + ", " + addressSyntax;
+        return name + " X" + Rt + ", " + labelName;
+    }
+}
+
+class Label extends Instruction {
+    String name;
+    int index;
+
+    Label(String name, int index) {
+        this.name = name;
+        this.index = index;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    @Override
+    public String toString() {
+        return name + ":";
     }
 }
